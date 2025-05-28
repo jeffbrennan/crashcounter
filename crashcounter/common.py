@@ -7,6 +7,5 @@ def get_secret(key: str) -> str:
     secret = os.getenv(key)
     if secret is None:
         raise ValueError(f"Secret {key} not found in environment variables.")
-    
-    return secret
 
+    return secret
