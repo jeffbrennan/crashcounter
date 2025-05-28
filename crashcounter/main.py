@@ -8,7 +8,7 @@ from sqlalchemy.engine.mock import MockConnection
 from sqlalchemy.orm import sessionmaker
 from typer import Typer
 
-from crashcounter.models import Base, Crash, Person, PersonOrm, Vehicle
+from crashcounter.models import Base, Crash, Person, Vehicle, VehicleOrm
 
 app = Typer()
 
@@ -31,7 +31,8 @@ def get_data(
         )
 
     data = response.json()
-    return [model(**item) for item in data]  # type: ignore
+    result = [model(**item) for item in data]
+    return result  # pyright: ignore
 
 
 def get_engine() -> MockConnection:
@@ -46,9 +47,9 @@ def get_engine() -> MockConnection:
     return engine
 
 
-def load_data(data: list[Person] | list[Crash] | list[Vehicle], target: Type[Base]): # type: ignore
+def load_data(data: list[Person] | list[Crash] | list[Vehicle], target: Type[Base]):  # type: ignore
     engine = get_engine()
-    Base.metadata.create_all(engine) # type: ignore
+    Base.metadata.create_all(engine)  # type: ignore
     with sessionmaker(bind=engine)() as session:
         for item in data:
             converted = target(**item.model_dump())
@@ -58,6 +59,17 @@ def load_data(data: list[Person] | list[Crash] | list[Vehicle], target: Type[Bas
         print(f"Loaded {len(data)} records into {target.__tablename__}.")
 
 
+@app.command("load")
+def main() -> None:
+    # result = get_data(Person, 0)
+    # load_data(result, PersonOrm)
+
+    # result = get_data(Crash, 0)
+    # load_data(result, CrashOrm)
+
+    result = get_data(Vehicle, 0)
+    load_data(result, VehicleOrm)
+
+
 if __name__ == "__main__":
-    result = get_data(Person, 0)
-    load_data(result, PersonOrm)
+    main()
