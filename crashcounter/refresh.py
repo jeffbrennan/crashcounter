@@ -56,7 +56,7 @@ def load_data(
     data: list[BaseModel],
     target: Type[Base],  # pyright: ignore
     load_type: str,
-) -> None:  # type: ignore
+) -> None:
     engine = get_engine()
     print(
         f"starting {load_type} of n={len(data)} records into {target.__tablename__}..."

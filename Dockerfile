@@ -15,7 +15,6 @@ RUN mkdir -p /var/lib/apt/lists/partial && \
 ENV PYTHONPATH="/opt/airflow:/opt/airflow/crashcounter"
 
 COPY crashcounter /opt/airflow/crashcounter
-# RUN chown -R ${AIRFLOW_UID:-50000}:0 /opt/airflow/crashcounter
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-install-project --no-editable
