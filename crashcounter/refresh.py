@@ -134,7 +134,7 @@ def refresh_all() -> None:
 
 @app.command("load")
 def main(
-    dataset: Annotated[Dataset, typer.Option("--dataset", "-d")] = Dataset.vehicle,
+    dataset: Annotated[Dataset, typer.Option("--dataset", "-d")] = Dataset.all,
 ) -> None:
     if dataset == Dataset.all:
         refresh_all()
