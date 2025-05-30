@@ -1,5 +1,6 @@
 import datetime
 import json
+from enum import StrEnum
 
 from pydantic import BaseModel, field_validator
 from sqlalchemy import Column, DateTime, Integer, String
@@ -7,6 +8,13 @@ from sqlalchemy.orm import declarative_base
 from sqlalchemy.types import Text
 
 Base = declarative_base()
+
+
+class Dataset(StrEnum):
+    person = "person"
+    crash = "crash"
+    vehicle = "vehicle"
+    all = "all"
 
 
 class PersonOrm(Base):
@@ -208,3 +216,10 @@ class Vehicle(BaseModel):
     public_property_damage_type: str | None = None
     contributing_factor_1: str | None = None
     contributing_factor_2: str | None = None
+
+
+refresh_map = {
+    Dataset.person: (Person, PersonOrm),
+    Dataset.crash: (Crash, CrashOrm),
+    Dataset.vehicle: (Vehicle, VehicleOrm),
+}

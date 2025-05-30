@@ -1,5 +1,4 @@
 import json
-from enum import StrEnum
 from typing import Annotated, Type
 
 import psycopg2
@@ -13,12 +12,8 @@ from typer import Typer
 from crashcounter.common import get_engine, get_model_metadata, timeit
 from crashcounter.models import (
     Base,
-    Crash,
-    CrashOrm,
-    Person,
-    PersonOrm,
-    Vehicle,
-    VehicleOrm,
+    Dataset,
+    refresh_map,
 )
 
 app = Typer(pretty_exceptions_enable=False)
@@ -132,28 +127,19 @@ def refresh_data(model: Type[BaseModel], target: Type[Base]):  # pyright: ignore
         attempts += 1
 
 
-class Dataset(StrEnum):
-    person = "person"
-    crash = "crash"
-    vehicle = "vehicle"
-    all = "all"
+def refresh_all() -> None:
+    for model, orm in refresh_map.values():
+        refresh_data(model, orm)
 
 
 @app.command("load")
 def main(
     dataset: Annotated[Dataset, typer.Option("--dataset", "-d")] = Dataset.vehicle,
 ) -> None:
-    refreshes = {
-        Dataset.person: (Person, PersonOrm),
-        Dataset.crash: (Crash, CrashOrm),
-        Dataset.vehicle: (Vehicle, VehicleOrm),
-    }
-
     if dataset == Dataset.all:
-        for model, orm in refreshes.values():
-            refresh_data(model, orm)
+        refresh_all()
     else:
-        refresh_data(*refreshes[dataset])
+        refresh_data(*refresh_map[dataset])
 
 
 if __name__ == "__main__":

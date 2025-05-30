@@ -51,11 +51,12 @@ def get_model_metadata(model: Type[BaseModel], key: str) -> str:
 
 def get_engine() -> MockConnection:
     url = URL.create(
-        drivername="postgresql",
-        username="postgres",
-        host="/tmp",
-        database="crashcounter",
+        drivername="postgresql+psycopg2",
+        username=get_secret("CRASHCOUNTER_DB_USER"),
+        password=get_secret("CRASHCOUNTER_DB_PASSWORD"),
+        host="crashcounter-db",
+        port=5432,
+        database=get_secret("CRASHCOUNTER_DB_NAME"),
     )
-
     engine = create_engine(url)
     return engine
