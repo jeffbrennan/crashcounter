@@ -1,11 +1,20 @@
 import datetime
 import json
+from enum import StrEnum
 
 from pydantic import BaseModel, field_validator
 from sqlalchemy import Column, DateTime, Integer, String
 from sqlalchemy.orm import declarative_base
+from sqlalchemy.types import Text
 
 Base = declarative_base()
+
+
+class Dataset(StrEnum):
+    person = "person"
+    crash = "crash"
+    vehicle = "vehicle"
+    all = "all"
 
 
 class PersonOrm(Base):
@@ -38,6 +47,8 @@ class Person(BaseModel):
         json_schema_extra = {
             "about": "https://data.cityofnewyork.us/Public-Safety/Motor-Vehicle-Collisions-Person/f55k-p6yu/about_data",
             "endpoint": "https://data.cityofnewyork.us/resource/f55k-p6yu.json",
+            "filter_field": "unique_id",
+            "primary_key": "unique_id",
         }
 
     unique_id: int
@@ -101,6 +112,8 @@ class Crash(BaseModel):
         json_schema_extra = {
             "about": "https://data.cityofnewyork.us/Public-Safety/Motor-Vehicle-Collisions-Crashes/h9gi-nx95/about_data",
             "endpoint": "https://data.cityofnewyork.us/resource/h9gi-nx95.json",
+            "filter_field": "collision_id",
+            "primary_key": "collision_id",
         }
 
     # dict -> json string for postgres insert
@@ -164,7 +177,7 @@ class VehicleOrm(Base):
     vehicle_damage_2 = Column(String(255))
     vehicle_damage_3 = Column(String(255))
     public_property_damage = Column(String(255))
-    public_property_damage_type = Column(String(255))
+    public_property_damage_type = Column(Text)
     contributing_factor_1 = Column(String(255))
     contributing_factor_2 = Column(String(255))
 
@@ -174,6 +187,8 @@ class Vehicle(BaseModel):
         json_schema_extra = {
             "about": "https://data.cityofnewyork.us/Public-Safety/Motor-Vehicle-Collisions-Vehicles/bm4k-52h4/about_data",
             "endpoint": "https://data.cityofnewyork.us/resource/bm4k-52h4.json",
+            "filter_field": "unique_id",
+            "primary_key": "unique_id",
         }
 
     unique_id: int
@@ -201,3 +216,10 @@ class Vehicle(BaseModel):
     public_property_damage_type: str | None = None
     contributing_factor_1: str | None = None
     contributing_factor_2: str | None = None
+
+
+refresh_map = {
+    Dataset.person: (Person, PersonOrm),
+    Dataset.crash: (Crash, CrashOrm),
+    Dataset.vehicle: (Vehicle, VehicleOrm),
+}
